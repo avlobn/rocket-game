@@ -866,19 +866,6 @@
         const ctx = canvas.getContext('2d');
         const loadingScreen = document.getElementById('loadingScreen');
 
-        // Обновляем размеры Canvas в зависимости от размеров окна
-        function resizeCanvas() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            drawMap(); // Перерисовываем карту после изменения размеров
-        }
-
-        // Задаем начальный размер
-        resizeCanvas();
-
-        // Слушаем изменения размеров окна
-        window.addEventListener('resize', resizeCanvas);
-
         // Размер карты
         let mapSize = 10;
 
@@ -888,21 +875,6 @@
 
         // Карта, загружаемая из JSON
         let map = [];
-
-        // Загрузка карты из JSON файла
-        async function loadMap() {
-            try {
-                const response = await fetch('map.json');
-                map = await response.json();
-                mapSize = map.length;
-                drawMap();
-
-                // Скрываем экран загрузки после завершения отрисовки
-                loadingScreen.style.display = 'none';
-            } catch (error) {
-                console.error('Ошибка загрузки карты:', error);
-            }
-        }
 
         // Загрузка изображений
         const images = {
@@ -918,12 +890,47 @@
             img.src = src;
             img.onload = () => {
                 imagesLoaded++;
+                console.log(`Изображение загружено: ${src}`); // Лог загрузки
                 if (imagesLoaded === totalImages) {
+                    // Перерисовываем карту после загрузки изображений
                     drawMap();
                     loadingScreen.style.display = 'none';
                 }
             };
+            img.onerror = () => {
+                console.error(`Ошибка загрузки изображения: ${src}`);
+            };
             return img;
+        }
+
+        // Обновляем размеры Canvas в зависимости от размеров окна
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            if (map.length > 0) {
+                drawMap(); // Перерисовываем карту после изменения размеров
+            }
+        }
+
+        // Задаем начальный размер
+        resizeCanvas();
+
+        // Слушаем изменения размеров окна
+        window.addEventListener('resize', resizeCanvas);
+
+        // Загрузка карты из JSON файла
+        async function loadMap() {
+            try {
+                const response = await fetch('map.json');
+                map = await response.json();
+                mapSize = map.length;
+                drawMap();
+
+                // Скрываем экран загрузки после завершения отрисовки
+                loadingScreen.style.display = 'none';
+            } catch (error) {
+                console.error('Ошибка загрузки карты:', error);
+            }
         }
 
         // Функция для отрисовки карты
