@@ -855,8 +855,22 @@
             z-index: 10;
             /* Поверх Canvas */
         }
+        
+        #actionMenu {
+            position: absolute;
+            display: none;
+            background-color: white;
+            border: 1px solid black;
+            z-index: 20;
+            padding: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
     </style>
     <div id="loadingScreen">Загрузка...</div>
+    <div id="actionMenu">
+        <button onclick="performAction('option1')">Действие 1</button>
+        <button onclick="performAction('option2')">Действие 2</button>
+    </div>
     <canvas id='gameCanvas' max-height: 100vw;max-width: 80vw;min-height: 100vw;min-width: 80vw; style='width: 80vw; /* 80% от ширины экрана */
             height: 80vh; /* 80% от высоты экрана */
             display: block; /* Убираем отступы */
@@ -865,6 +879,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const loadingScreen = document.getElementById('loadingScreen');
+        const actionMenu = document.getElementById('actionMenu');
 
         // Размер карты
         let mapSize = 10;
@@ -979,9 +994,54 @@
             startDistance = 0;
         }
 
+        // Функция обработки нажатия на ячейку
+        function handleCellClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const cellSize = (canvas.width / mapSize) * scale;
+
+            const col = Math.floor(x / cellSize);
+            const row = Math.floor(y / cellSize);
+
+            // Проверяем, что клик произошел по существующей ячейке
+            if (row >= 0 && row < mapSize && col >= 0 && col < mapSize) {
+                showActionMenu(event.pageX, event.pageY, row, col);
+            }
+        }
+
+        // Функция для отображения меню действий
+        function showActionMenu(x, y, row, col) {
+            actionMenu.style.display = 'block';
+            actionMenu.style.left = `${x}px`;
+            actionMenu.style.top = `${y}px`;
+
+            // Сохраняем текущую позицию для использования в действиях
+            actionMenu.dataset.row = row;
+            actionMenu.dataset.col = col;
+        }
+
+        // Функция для выполнения действия
+        function performAction(action) {
+            const row = parseInt(actionMenu.dataset.row, 10);
+            const col = parseInt(actionMenu.dataset.col, 10);
+            console.log(`Выполнение действия ${action} на ячейке (${row}, ${col})`);
+
+            // Пример действия - изменение изображения в ячейке
+            if (action === 'option1') {
+                map[row][col] = (map[row][col] + 1) % Object.keys(images).length;
+                drawMap();
+            }
+
+            actionMenu.style.display = 'none'; // Скрыть меню после выбора действия
+        }
+
         // Подписка на события сенсорного ввода
         canvas.addEventListener('touchmove', handleGesture);
         canvas.addEventListener('touchend', endGesture);
+
+        // Добавляем обработчик нажатия мыши на Canvas
+        canvas.addEventListener('click', handleCellClick);
 
         // Загрузка карты
         loadMap();
