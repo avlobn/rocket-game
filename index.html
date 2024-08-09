@@ -844,15 +844,24 @@
             display: block; /* Убираем отступы */
             margin: auto; /* Центрируем Canvas */'></canvas>
     <script>
-        // Получаем элемент Canvas и контекст рисования
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Обновляем размеры Canvas в зависимости от размеров окна
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            drawMap(); // Перерисовываем карту после изменения размеров
+        }
+
+        // Задаем начальный размер
+        resizeCanvas();
+
+        // Слушаем изменения размеров окна
+        window.addEventListener('resize', resizeCanvas);
+
         // Размер карты
         let mapSize = 10;
-
-        // Размер каждой ячейки в пикселях (будет динамически обновляться)
-        let cellSize = canvas.width / mapSize;
 
         // Масштаб
         let scale = 1;
@@ -867,7 +876,6 @@
                 const response = await fetch('map.json');
                 map = await response.json();
                 mapSize = map.length;
-                cellSize = canvas.width / mapSize;
                 drawMap();
             } catch (error) {
                 console.error('Ошибка загрузки карты:', error);
@@ -876,8 +884,8 @@
 
         // Загрузка изображений
         const images = {
-            0: loadImage('imageGame/1.jpg'),
-            1: loadImage('imageGame/2.png'),
+            0: loadImage('path/to/image0.png'),
+            1: loadImage('path/to/image1.png'),
         };
 
         function loadImage(src) {
@@ -888,6 +896,8 @@
 
         // Функция для отрисовки карты
         function drawMap() {
+            const cellSize = (canvas.width / mapSize) * scale; // Обновляем размер ячеек
+
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем холст
 
             for (let row = 0; row < mapSize; row++) {
@@ -920,9 +930,7 @@
                     scale *= scaleChange;
                     startDistance = distance;
 
-                    // Обновляем размер ячеек в зависимости от масштаба
-                    cellSize = (canvas.width / mapSize) * scale;
-                    drawMap();
+                    drawMap(); // Перерисовываем карту после изменения масштаба
                 }
             }
         }
