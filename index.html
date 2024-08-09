@@ -963,7 +963,10 @@ img.src = "imageGame/empty.png";
             const cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
 
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем холст
-
+   // Включаем сглаживание для улучшения качества изображения
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
             for (let row = 0; row < map.length; row++) {
                 for (let col = 0; col < map.length; col++) {
                     const value = map[row][col];
