@@ -836,7 +836,7 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
                 </div>
             </div>
-            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">5555555$</strong></div>
+            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">666666$</strong></div>
             <div class="col-md-3" style="max-width: 15vw;max-height: 10vw;min-width: 15vw;min-height: 10vw;margin-left: 17vw;"><img src="assets/img/fabulous-night-starry-sky-with-moon-in-a-gloomy-atmosphere-shrouded-in-mist-in-a-quiet-forest-epic-.png" style="min-width: 10vw;max-width: 10vw;min-height: 10vw;max-height: 10vw;"></div>
         </div>
     </div>
@@ -936,6 +936,8 @@
         let isDragging = false;
         let startX, startY;
         let startDistance = 0;
+        let lastTap = 0; // Время последнего одиночного касания
+
         let cellSize;
 
         // Карта, которая будет сгенерирована
@@ -996,8 +998,6 @@
         // Задаем начальный размер
         resizeCanvas();
 
-        // Слушаем изменения размеров окна
-        window.addEventListener('resize', resizeCanvas);
 
         // Функция для отрисовки карты
         function drawMap() {
@@ -1052,19 +1052,7 @@
             }
         }
 
-        function handleClick(event) {
-            // Обработка одиночного нажатия
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
 
-            const col = Math.floor((x - offsetX) / (50 * scale));
-            const row = Math.floor((y - offsetY) / (50 * scale));
-
-            // Пример обработки клика
-            showActionMenu(x, y, row, col);
-            console.log(`Clicked on cell (${row}, ${col})`);
-        }
 
         // Функция для отображения меню действий
         function showActionMenu(x, y, row, col) {
@@ -1099,7 +1087,6 @@
                 startY = event.touches[0].pageY - offsetY;
                 event.preventDefault();
             } else if (event.touches.length === 2) {
-                // Запоминаем начальное расстояние между двумя пальцами
                 const dx = event.touches[0].pageX - event.touches[1].pageX;
                 const dy = event.touches[0].pageY - event.touches[1].pageY;
                 startDistance = Math.sqrt(dx * dx + dy * dy);
@@ -1124,12 +1111,10 @@
                 const currentDistance = Math.sqrt(dx * dx + dy * dy);
 
                 if (startDistance > 0) {
-                    // Рассчитываем новый масштаб
                     const scaleChange = currentDistance / startDistance;
                     scale *= scaleChange;
                     startDistance = currentDistance;
 
-                    // Обновляем смещение для центрирования на месте пальцев
                     const centerX = (event.touches[0].pageX + event.touches[1].pageX) / 2;
                     const centerY = (event.touches[0].pageY + event.touches[1].pageY) / 2;
                     offsetX = centerX - (centerX - offsetX) * scaleChange;
@@ -1142,19 +1127,43 @@
         }
 
         function handleTouchEnd(event) {
+            const now = Date.now();
+            const timeSinceLastTap = now - lastTap;
+
             if (event.touches.length === 0) {
+                if (timeSinceLastTap < 300 && !isDragging) {
+                    // Обрабатываем как одиночное касание
+                    handleTap(event);
+                }
+                lastTap = now;
                 isDragging = false;
                 startDistance = 0;
             }
             event.preventDefault();
         }
+
+        function handleTap(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.changedTouches[0].clientX - rect.left;
+            const y = event.changedTouches[0].clientY - rect.top;
+
+            const col = Math.floor((x - offsetX) / (50 * scale));
+            const row = Math.floor((y - offsetY) / (50 * scale));
+
+            console.log(Tapped on cell($ {
+                row
+            }, $ {
+                col
+            }));
+            showActionMenu(x, y, row, col)
+        }
+
         resizeCanvas();
+
+        window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchmove', handleTouchMove);
         canvas.addEventListener('touchend', handleTouchEnd);
-
-        // Добавляем обработчик нажатия мыши на Canvas
-        canvas.addEventListener('click', handleClick);
     </script>
     <div class="container" style="max-height: 10vw;max-width: 100vw;min-width: 100vw;position: static;display: block;">
         <div class="row">
