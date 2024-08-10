@@ -1111,12 +1111,17 @@
             }
         }
 
-        function handleTouchEnd(event) {
-            if (event.touches.length === 0) {
-                isDragging = false;
-                startDistance = 0;
+        function handleCellClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const col = Math.floor((x - offsetX) / cellSize);
+            const row = Math.floor((y - offsetY) / cellSize);
+
+            if (row >= 0 && row < map.length && col >= 0 && col < map.length) {
+                showActionMenu(event.pageX, event.pageY, row, col);
             }
-            event.preventDefault();
         }
 
         canvas.addEventListener('touchstart', handleTouchStart);
