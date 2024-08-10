@@ -1044,20 +1044,6 @@
             }
         }
 
-        // Функция обработки нажатия на ячейку
-        function handleCellClick(event) {
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const col = Math.floor(x / cellSize);
-            const row = Math.floor(y / cellSize);
-
-            // Проверяем, что клик произошел по существующей ячейке
-            if (row >= 0 && row < map.length && col >= 0 && col < map.length) {
-                showActionMenu(event.pageX, event.pageY, row, col);
-            }
-        }
 
         // Функция для отображения меню действий
         function showActionMenu(x, y, row, col) {
@@ -1085,41 +1071,20 @@
             actionMenu.style.display = 'none'; // Скрыть меню после выбора действия
         }
 
-        // Обработчик событий для жестов pinch
-        function handleGesture(event) {
-            if (event.touches.length === 2) {
-                const dx = event.touches[0].pageX - event.touches[1].pageX;
-                const dy = event.touches[0].pageY - event.touches[1].pageY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (!startDistance) {
-                    startDistance = distance;
-                } else {
-                    const scaleChange = distance / startDistance;
-                    scale *= scaleChange;
-                    startDistance = distance;
-
-                    // Обновляем размер ячеек в зависимости от масштаба
-                    drawMap();
-                }
-            }
-        }
-
-        // Обработчик окончания жеста pinch
-        function endGesture() {
-            startDistance = 0;
-        }
-        // Обработчик начала жеста перемещения
         function handleTouchStart(event) {
             if (event.touches.length === 1) {
                 isDragging = true;
                 startX = event.touches[0].pageX - offsetX;
                 startY = event.touches[0].pageY - offsetY;
                 event.preventDefault();
+            } else if (event.touches.length === 2) {
+                const dx = event.touches[0].pageX - event.touches[1].pageX;
+                const dy = event.touches[0].pageY - event.touches[1].pageY;
+                startDistance = Math.sqrt(dx * dx + dy * dy);
+                event.preventDefault();
             }
         }
 
-        // Обработчик движения жеста перемещения
         function handleTouchMove(event) {
             if (isDragging && event.touches.length === 1) {
                 const x = event.touches[0].pageX;
@@ -1130,22 +1095,33 @@
 
                 drawMap();
                 event.preventDefault();
+            } else if (event.touches.length === 2) {
+                const dx = event.touches[0].pageX - event.touches[1].pageX;
+                const dy = event.touches[0].pageY - event.touches[1].pageY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (startDistance) {
+                    const scaleChange = distance / startDistance;
+                    scale *= scaleChange;
+                    startDistance = distance;
+
+                    drawMap();
+                }
+                event.preventDefault();
             }
         }
 
-        // Обработчик окончания жеста перемещения
         function handleTouchEnd(event) {
-            isDragging = false;
+            if (event.touches.length === 0) {
+                isDragging = false;
+                startDistance = 0;
+            }
             event.preventDefault();
-        } // Подписка на события сенсорного ввода
+        }
+
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchmove', handleTouchMove);
         canvas.addEventListener('touchend', handleTouchEnd);
-
-        // Подписка на события сенсорного ввода
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchmove', handleGesture);
-        canvas.addEventListener('touchend', endGesture);
 
         // Добавляем обработчик нажатия мыши на Canvas
         canvas.addEventListener('click', handleCellClick);
