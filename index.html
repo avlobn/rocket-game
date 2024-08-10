@@ -836,7 +836,7 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
                 </div>
             </div>
-            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno4$</strong></div>
+            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno5$</strong></div>
             <div class="col-md-3" style="max-width: 15vw;max-height: 10vw;min-width: 15vw;min-height: 10vw;margin-left: 17vw;"><img src="assets/img/fabulous-night-starry-sky-with-moon-in-a-gloomy-atmosphere-shrouded-in-mist-in-a-quiet-forest-epic-.png" style="min-width: 10vw;max-width: 10vw;min-height: 10vw;max-height: 10vw;"></div>
         </div>
     </div>
@@ -1005,17 +1005,17 @@
 
         // Функция для отрисовки карты
         function drawMap() {
-
+            cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
 
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем холст
-            cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
+
 
             ctx.save(); // Сохраняем текущее состояние контекста
             ctx.translate(offsetX, offsetY); // Применяем смещение
             ctx.scale(scale, scale); // Применяем масштаб
             // Включаем сглаживание для улучшения качества изображения
 
-            cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
+
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
@@ -1035,7 +1035,6 @@
                 // Выделяем выбранную ячейку
                 if (selectedRow !== -1 && selectedCol !== -1) {
                     ctx.strokeStyle = 'red';
-                    ctx.lineWidth = 3;
                     ctx.strokeRect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
                 }
 
@@ -1090,17 +1089,6 @@
             selectedCol = col;
 
 
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            // Преобразуем координаты с учетом смещения и масштаба
-            const transformedX = (x - offsetX) / scale;
-            const transformedY = (y - offsetY) / scale;
-
-            // Вычисляем координаты ячейки
-            selectedCol = Math.floor(transformedX / cellSize);
-            selectedRow = Math.floor(transformedY / cellSize);
             drawMap();
 
             // Пример действия - изменение изображения в ячейке
