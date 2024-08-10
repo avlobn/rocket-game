@@ -836,7 +836,7 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
                 </div>
             </div>
-            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno7$</strong></div>
+            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno8$</strong></div>
             <div class="col-md-3" style="max-width: 15vw;max-height: 10vw;min-width: 15vw;min-height: 10vw;margin-left: 17vw;"><img src="assets/img/fabulous-night-starry-sky-with-moon-in-a-gloomy-atmosphere-shrouded-in-mist-in-a-quiet-forest-epic-.png" style="min-width: 10vw;max-width: 10vw;min-height: 10vw;max-height: 10vw;"></div>
         </div>
     </div>
@@ -1034,7 +1034,6 @@
                     ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
                 }
                 // Выделяем выбранную ячейку
-                cellSize = (canvas.width / map.length) * scale;
                 if (selectedRow !== -1 && selectedCol !== -1) {
                     ctx.strokeStyle = 'red';
                     ctx.strokeRect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
