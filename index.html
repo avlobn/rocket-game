@@ -1078,6 +1078,15 @@
             actionMenu.style.left = '${x}px';
             actionMenu.style.top = '${y}px';
 
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const transformedX = (x - offsetX) / scale;
+            const transformedY = (y - offsetY) / scale;
+
+            const col = Math.floor(transformedX / cellSize);
+            const row = Math.floor(transformedY / cellSize);
             // Сохраняем текущую позицию для использования в действиях
             actionMenu.dataset.row = row;
             actionMenu.dataset.col = col;
