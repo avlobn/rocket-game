@@ -836,7 +836,7 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
                 </div>
             </div>
-            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">22423422$</strong></div>
+            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">5555555$</strong></div>
             <div class="col-md-3" style="max-width: 15vw;max-height: 10vw;min-width: 15vw;min-height: 10vw;margin-left: 17vw;"><img src="assets/img/fabulous-night-starry-sky-with-moon-in-a-gloomy-atmosphere-shrouded-in-mist-in-a-quiet-forest-epic-.png" style="min-width: 10vw;max-width: 10vw;min-height: 10vw;max-height: 10vw;"></div>
         </div>
     </div>
@@ -931,12 +931,13 @@
 
         // Масштаб
         let scale = 1;
-        let startDistance = 0;
-        let cellSize;
-        let isDragging = false;
-        let startX, startY;
         let offsetX = 0,
             offsetY = 0;
+        let isDragging = false;
+        let startX, startY;
+        let startDistance = 0;
+        let cellSize;
+
         // Карта, которая будет сгенерирована
         let map = [];
 
@@ -963,14 +964,14 @@
             img.src = src;
             img.onload = () => {
                 imagesLoaded++;
-                console.log(`Изображение загружено: ${src}`); // Лог загрузки
+                console.log('Изображение загружено: ${src}'); // Лог загрузки
                 if (imagesLoaded === totalImages) {
                     loadingScreen.style.display = 'none';
                     drawMap(); // Перерисовываем карту после загрузки изображений
                 }
             };
             img.onerror = () => {
-                console.error(`Ошибка загрузки изображения: ${src}`);
+                console.error('Ошибка загрузки изображения: ${src}');
                 img.src = 'imageGame/empty.png';
                 img.onload = () => {
                     imagesLoaded++;
@@ -998,6 +999,7 @@
         // Слушаем изменения размеров окна
         window.addEventListener('resize', resizeCanvas);
 
+        // Функция для отрисовки карты
         function drawMap() {
             cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
 
@@ -1013,43 +1015,62 @@
                     const image = images[value] || images['empty']; // Подставляем пустое изображение, если картинка не найдена
 
                     if (image) {
-                        ctx.drawImage(image, col * cellSize + offsetX, row * cellSize + offsetY, cellSize, cellSize);
+                        ctx.drawImage(image, col * cellSize, row * cellSize, cellSize, cellSize);
                     }
 
                     // Рисуем границу ячейки
                     ctx.strokeStyle = 'black';
-                    ctx.strokeRect(col * cellSize + offsetX, row * cellSize + offsetY, cellSize, cellSize);
+                    ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
                 }
-            }
 
-            // Рисуем цветные рамки для групп 10x10 ячеек
-            const borderColors = [
-                'red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'gray', 'brown'
-            ];
-            const numRows = map.length;
-            const numCols = map[0].length;
 
-            for (let startRow = 0; startRow < numRows; startRow += 10) {
-                for (let startCol = 0; startCol < numCols; startCol += 10) {
-                    const endRow = Math.min(startRow + 10, numRows);
-                    const endCol = Math.min(startCol + 10, numCols);
 
-                    const colorIndex = Math.floor((startRow / 10) % borderColors.length);
-                    const borderColor = borderColors[colorIndex];
 
-                    ctx.strokeStyle = borderColor;
-                    ctx.lineWidth = 4; // Ширина рамки
-                    ctx.strokeRect(startCol * cellSize + offsetX, startRow * cellSize + offsetY, (endCol - startCol) * cellSize, (endRow - startRow) * cellSize);
+                // Определяем массив цветов для рамок
+                const borderColors = [
+                    'red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'gray', 'brown'
+                ];
+                // Рисуем цветные рамки для групп 10x10 ячеек
+                const numRows = map.length;
+                const numCols = map[0].length;
+
+                for (let startRow = 0; startRow < numRows; startRow += 10) {
+                    for (let startCol = 0; startCol < numCols; startCol += 10) {
+                        const endRow = Math.min(startRow + 10, numRows);
+                        const endCol = Math.min(startCol + 10, numCols);
+
+                        // Определяем цвет рамки для текущего блока
+                        const colorIndex = Math.floor((startRow / 10) % borderColors.length);
+                        const borderColor = borderColors[colorIndex];
+
+                        // Рисуем рамку для блока 10x10
+                        ctx.strokeStyle = borderColor;
+                        ctx.lineWidth = 4; // Ширина рамки
+                        ctx.strokeRect(startCol * cellSize, startRow * cellSize, (endCol - startCol) * cellSize, (endRow - startRow) * cellSize);
+                    }
                 }
             }
         }
 
+        function handleClick(event) {
+            // Обработка одиночного нажатия
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const col = Math.floor((x - offsetX) / (50 * scale));
+            const row = Math.floor((y - offsetY) / (50 * scale));
+
+            // Пример обработки клика
+            showActionMenu(x, y, row, col);
+            console.log(`Clicked on cell (${row}, ${col})`);
+        }
 
         // Функция для отображения меню действий
         function showActionMenu(x, y, row, col) {
             actionMenu.style.display = 'block';
-            actionMenu.style.left = `${x}px`;
-            actionMenu.style.top = `${y}px`;
+            actionMenu.style.left = '${x}px';
+            actionMenu.style.top = '${y}px';
 
             // Сохраняем текущую позицию для использования в действиях
             actionMenu.dataset.row = row;
@@ -1060,7 +1081,7 @@
         function performAction(action) {
             const row = parseInt(actionMenu.dataset.row, 10);
             const col = parseInt(actionMenu.dataset.col, 10);
-            console.log(`Выполнение действия ${action} на ячейке (${row}, ${col})`);
+            console.log('Выполнение действия ${action} на ячейке (${row}, ${col})');
 
             // Пример действия - изменение изображения в ячейке
             if (action === 'option1') {
@@ -1071,7 +1092,6 @@
             actionMenu.style.display = 'none'; // Скрыть меню после выбора действия
         }
 
-
         function handleTouchStart(event) {
             if (event.touches.length === 1) {
                 isDragging = true;
@@ -1079,15 +1099,17 @@
                 startY = event.touches[0].pageY - offsetY;
                 event.preventDefault();
             } else if (event.touches.length === 2) {
+                // Запоминаем начальное расстояние между двумя пальцами
                 const dx = event.touches[0].pageX - event.touches[1].pageX;
                 const dy = event.touches[0].pageY - event.touches[1].pageY;
                 startDistance = Math.sqrt(dx * dx + dy * dy);
+                isDragging = false;
                 event.preventDefault();
             }
         }
 
         function handleTouchMove(event) {
-            if (isDragging && event.touches.length === 1) {
+            if (event.touches.length === 1 && isDragging) {
                 const x = event.touches[0].pageX;
                 const y = event.touches[0].pageY;
 
@@ -1099,12 +1121,19 @@
             } else if (event.touches.length === 2) {
                 const dx = event.touches[0].pageX - event.touches[1].pageX;
                 const dy = event.touches[0].pageY - event.touches[1].pageY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+                const currentDistance = Math.sqrt(dx * dx + dy * dy);
 
-                if (startDistance) {
-                    const scaleChange = distance / startDistance;
+                if (startDistance > 0) {
+                    // Рассчитываем новый масштаб
+                    const scaleChange = currentDistance / startDistance;
                     scale *= scaleChange;
-                    startDistance = distance;
+                    startDistance = currentDistance;
+
+                    // Обновляем смещение для центрирования на месте пальцев
+                    const centerX = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+                    const centerY = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+                    offsetX = centerX - (centerX - offsetX) * scaleChange;
+                    offsetY = centerY - (centerY - offsetY) * scaleChange;
 
                     drawMap();
                 }
@@ -1119,15 +1148,14 @@
             }
             event.preventDefault();
         }
-
+        resizeCanvas();
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchmove', handleTouchMove);
         canvas.addEventListener('touchend', handleTouchEnd);
 
         // Добавляем обработчик нажатия мыши на Canvas
-        canvas.addEventListener('click', handleCellClick);
+        canvas.addEventListener('click', handleClick);
     </script>
-
     <div class="container" style="max-height: 10vw;max-width: 100vw;min-width: 100vw;position: static;display: block;">
         <div class="row">
             <div class="col-md-3" style="max-height: 10vw;max-width: 15vw;min-height: 10vw;min-width: 15vw;"><img src="assets/img/696.jpg" style="max-height: 10vw;max-width: 10vw;min-height: 10vw;min-width: 10vw;"></div>
