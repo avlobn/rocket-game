@@ -1035,7 +1035,7 @@
                     ctx.fillRect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
 
                 }
-                ctx.restore(); // Восстанавливаем предыдущее состояние контекста
+
 
 
                 // Определяем массив цветов для рамок
@@ -1062,6 +1062,7 @@
                     }
                 }
             }
+            ctx.restore(); // Восстанавливаем предыдущее состояние контекста
         }
 
 
