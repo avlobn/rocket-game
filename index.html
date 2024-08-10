@@ -970,13 +970,14 @@
                 console.error(`Ошибка загрузки изображения: ${src}`);
                 img.src = 'imageGame/empty.png';
                 img.onload = () => {
-                    img.src = 'imageGame/empty.png';
                     imagesLoaded++;
+                    if (imagesLoaded === totalImages) {
+                        loadingScreen.style.display = 'none';
+                        drawMap(); // Перерисовываем карту даже при ошибке загрузки
+                    }
+
                 }
-                if (imagesLoaded === totalImages) {
-                    loadingScreen.style.display = 'none';
-                    drawMap(); // Перерисовываем карту даже при ошибке загрузки
-                }
+
             };
             return img;
         }
