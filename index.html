@@ -1018,6 +1018,33 @@
                     ctx.strokeStyle = 'black';
                     ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
                 }
+
+
+
+
+                // Определяем массив цветов для рамок
+                const borderColors = [
+                    'red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'gray', 'brown'
+                ];
+                // Рисуем цветные рамки для групп 10x10 ячеек
+                const numRows = map.length;
+                const numCols = map[0].length;
+
+                for (let startRow = 0; startRow < numRows; startRow += 10) {
+                    for (let startCol = 0; startCol < numCols; startCol += 10) {
+                        const endRow = Math.min(startRow + 10, numRows);
+                        const endCol = Math.min(startCol + 10, numCols);
+
+                        // Определяем цвет рамки для текущего блока
+                        const colorIndex = Math.floor((startRow / 10) % borderColors.length);
+                        const borderColor = borderColors[colorIndex];
+
+                        // Рисуем рамку для блока 10x10
+                        ctx.strokeStyle = borderColor;
+                        ctx.lineWidth = 4; // Ширина рамки
+                        ctx.strokeRect(startCol * cellSize, startRow * cellSize, (endCol - startCol) * cellSize, (endRow - startRow) * cellSize);
+                    }
+                }
             }
         }
 
