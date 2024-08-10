@@ -933,7 +933,10 @@
         let scale = 1;
         let startDistance = 0;
         let cellSize;
-
+        let isDragging = false;
+        let startX, startY;
+        let offsetX = 0,
+            offsetY = 0;
         // Карта, которая будет сгенерирована
         let map = [];
 
@@ -995,7 +998,6 @@
         // Слушаем изменения размеров окна
         window.addEventListener('resize', resizeCanvas);
 
-        // Функция для отрисовки карты
         function drawMap() {
             cellSize = (canvas.width / map.length) * scale; // Обновляем размер ячеек
 
@@ -1011,39 +1013,33 @@
                     const image = images[value] || images['empty']; // Подставляем пустое изображение, если картинка не найдена
 
                     if (image) {
-                        ctx.drawImage(image, col * cellSize, row * cellSize, cellSize, cellSize);
+                        ctx.drawImage(image, col * cellSize + offsetX, row * cellSize + offsetY, cellSize, cellSize);
                     }
 
                     // Рисуем границу ячейки
                     ctx.strokeStyle = 'black';
-                    ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    ctx.strokeRect(col * cellSize + offsetX, row * cellSize + offsetY, cellSize, cellSize);
                 }
+            }
 
+            // Рисуем цветные рамки для групп 10x10 ячеек
+            const borderColors = [
+                'red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'gray', 'brown'
+            ];
+            const numRows = map.length;
+            const numCols = map[0].length;
 
+            for (let startRow = 0; startRow < numRows; startRow += 10) {
+                for (let startCol = 0; startCol < numCols; startCol += 10) {
+                    const endRow = Math.min(startRow + 10, numRows);
+                    const endCol = Math.min(startCol + 10, numCols);
 
+                    const colorIndex = Math.floor((startRow / 10) % borderColors.length);
+                    const borderColor = borderColors[colorIndex];
 
-                // Определяем массив цветов для рамок
-                const borderColors = [
-                    'red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'gray', 'brown'
-                ];
-                // Рисуем цветные рамки для групп 10x10 ячеек
-                const numRows = map.length;
-                const numCols = map[0].length;
-
-                for (let startRow = 0; startRow < numRows; startRow += 10) {
-                    for (let startCol = 0; startCol < numCols; startCol += 10) {
-                        const endRow = Math.min(startRow + 10, numRows);
-                        const endCol = Math.min(startCol + 10, numCols);
-
-                        // Определяем цвет рамки для текущего блока
-                        const colorIndex = Math.floor((startRow / 10) % borderColors.length);
-                        const borderColor = borderColors[colorIndex];
-
-                        // Рисуем рамку для блока 10x10
-                        ctx.strokeStyle = borderColor;
-                        ctx.lineWidth = 4; // Ширина рамки
-                        ctx.strokeRect(startCol * cellSize, startRow * cellSize, (endCol - startCol) * cellSize, (endRow - startRow) * cellSize);
-                    }
+                    ctx.strokeStyle = borderColor;
+                    ctx.lineWidth = 4; // Ширина рамки
+                    ctx.strokeRect(startCol * cellSize + offsetX, startRow * cellSize + offsetY, (endCol - startCol) * cellSize, (endRow - startRow) * cellSize);
                 }
             }
         }
@@ -1113,8 +1109,41 @@
         function endGesture() {
             startDistance = 0;
         }
+        // Обработчик начала жеста перемещения
+        function handleTouchStart(event) {
+            if (event.touches.length === 1) {
+                isDragging = true;
+                startX = event.touches[0].pageX - offsetX;
+                startY = event.touches[0].pageY - offsetY;
+                event.preventDefault();
+            }
+        }
+
+        // Обработчик движения жеста перемещения
+        function handleTouchMove(event) {
+            if (isDragging && event.touches.length === 1) {
+                const x = event.touches[0].pageX;
+                const y = event.touches[0].pageY;
+
+                offsetX = x - startX;
+                offsetY = y - startY;
+
+                drawMap();
+                event.preventDefault();
+            }
+        }
+
+        // Обработчик окончания жеста перемещения
+        function handleTouchEnd(event) {
+            isDragging = false;
+            event.preventDefault();
+        } // Подписка на события сенсорного ввода
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        canvas.addEventListener('touchend', handleTouchEnd);
 
         // Подписка на события сенсорного ввода
+        canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchmove', handleGesture);
         canvas.addEventListener('touchend', endGesture);
 
