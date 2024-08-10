@@ -836,7 +836,7 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
                 </div>
             </div>
-            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno12$</strong></div>
+            <div class="col-md-3 col-lg-3" style="display: block;max-width: 30vw;max-height: 10vw;min-height: 10vw;min-width: 30vw;"><strong style="max-width: 30vw;min-width: 30vw;min-height: 10vw;max-height: 10vw;font-size: 4.5vw;margin-left: 0px;padding-left: 1vw;letter-spacing: 0px;line-height: 9vw;text-align: left;">gavno14$</strong></div>
             <div class="col-md-3" style="max-width: 15vw;max-height: 10vw;min-width: 15vw;min-height: 10vw;margin-left: 17vw;"><img src="assets/img/fabulous-night-starry-sky-with-moon-in-a-gloomy-atmosphere-shrouded-in-mist-in-a-quiet-forest-epic-.png" style="min-width: 10vw;max-width: 10vw;min-height: 10vw;max-height: 10vw;"></div>
         </div>
     </div>
@@ -1078,21 +1078,9 @@
             actionMenu.style.left = '${x}px';
             actionMenu.style.top = '${y}px';
 
-            const rect = canvas.getBoundingClientRect();
-            x = e.clientX - rect.left;
-            y = e.clientY - rect.top;
-
-            const transformedX = (x - offsetX) / scale;
-            const transformedY = (y - offsetY) / scale;
-
-            col = Math.floor(transformedX / cellSize);
-            row = Math.floor(transformedY / cellSize);
             // Сохраняем текущую позицию для использования в действиях
             actionMenu.dataset.row = row;
             actionMenu.dataset.col = col;
-            selectedRow = row;
-            selectedCol = col;
-            drawMap();
         }
 
         // Функция для выполнения действия
@@ -1100,7 +1088,8 @@
             const row = parseInt(actionMenu.dataset.row, 10);
             const col = parseInt(actionMenu.dataset.col, 10);
             console.log('Выполнение действия ${action} на ячейке (${row}, ${col})');
-
+            selectedRow = row;
+            selectedCol = col;
 
 
             drawMap();
@@ -1226,6 +1215,63 @@
         canvas.addEventListener('touchend', function(e) {
             if (e.touches.length === 0) {
                 isDragging = false;
+            }
+        });
+
+        function handleTap(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const transformedX = (x - offsetX) / scale;
+            const transformedY = (y - offsetY) / scale;
+
+            const col = Math.floor(transformedX / cellSize);
+            const row = Math.floor(transformedY / cellSize);
+
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                // Двойной тап
+                console.log(`Double tapped at: (${x}, ${y})`);
+                lastTap = 0; // Сброс после двойного тапа
+                return;
+            }
+            lastTap = now;
+
+            console.log(`Tapped at: (${x}, ${y})`);
+            console.log(`Transformed: (${transformedX}, ${transformedY})`);
+            console.log(`Cell: (${col}, ${row})`);
+
+            if (col >= 0 && col < map[0].length && row >= 0 && row < map.length) {
+                selectedRow = row;
+                selectedCol = col;
+                drawMap();
+                showActionMenu(e.clientX, e.clientY, row, col);
+            }
+        }
+        canvas.addEventListener('touchend', handleTap);
+
+
+        canvas.addEventListener('click', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const transformedX = (x - offsetX) / scale;
+            const transformedY = (y - offsetY) / scale;
+
+            const col = Math.floor(transformedX / cellSize);
+            const row = Math.floor(transformedY / cellSize);
+
+            console.log(`Clicked at: (${x}, ${y})`);
+            console.log(`Transformed: (${transformedX}, ${transformedY})`);
+            console.log(`Cell: (${col}, ${row})`);
+
+            if (col >= 0 && col < map[0].length && row >= 0 && row < map.length) {
+                selectedRow = row;
+                selectedCol = col;
+                drawMap();
+                showActionMenu(e.clientX, e.clientY, row, col);
             }
         });
     </script>
