@@ -1030,12 +1030,12 @@
                 }
                 // Рисуем выделенную ячейку, если она есть
                 if (selectedRow !== null && selectedCol !== null) {
-                    // ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Полупрозрачный красный
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Полупрозрачный красный
 
-                    // ctx.fillRect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
+                    ctx.fillRect(selectedCol * cellSize, selectedRow * cellSize, cellSize, cellSize);
 
                 }
-
+                ctx.restore(); // Восстанавливаем предыдущее состояние контекста
 
 
                 // Определяем массив цветов для рамок
