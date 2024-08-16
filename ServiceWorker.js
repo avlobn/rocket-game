@@ -1,4 +1,4 @@
-const cacheName = "DefaultCompany-RocketGame-1.0.2";
+const cacheName = "DefaultCompany-RocketGame-1.0.3";
 const contentToCache = [
     "Build/Builds.loader.js",
     "Build/Builds.framework.js",
